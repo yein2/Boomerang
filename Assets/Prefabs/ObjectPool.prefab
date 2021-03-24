@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1576447501936466128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1576447501936466142}
+  - component: {fileID: 1576447501936466129}
+  m_Layer: 0
+  m_Name: ObjectPool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1576447501936466142
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576447501936466128}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.1043158, y: 6.0582657, z: -1.5586576}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1576447501936466129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576447501936466128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35d5705b08f6bed4b953d93b2ebc7bf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectPoolList:
+  - Name: Normal
+    prefab: {fileID: 2366830293191159749, guid: 740104acf5396d941889af82f5434825,
+      type: 3}
+    Size: 20
+  - Name: Move
+    prefab: {fileID: 9135503661971795204, guid: 25687d7519e31944f98415ae83265de0,
+      type: 3}
+    Size: 10
+  - Name: Tank
+    prefab: {fileID: 127366199983613570, guid: a68318c5a48daf04fb09e81baa74088c, type: 3}
+    Size: 10
+  - Name: Shield
+    prefab: {fileID: 5172632149393906428, guid: 0229e68809436664897374256534bbab,
+      type: 3}
+    Size: 10
+  - Name: ShieldChild
+    prefab: {fileID: 2517272897913084593, guid: 211b913812fae944b9d85a1284c93eef,
+      type: 3}
+    Size: 10
+  - Name: Ghost
+    prefab: {fileID: 7607620029459222980, guid: c2036844046b2b34fa0153b47cc034c4,
+      type: 3}
+    Size: 10
+  - Name: Boomerang
+    prefab: {fileID: 8425522998043385185, guid: bfdc6bbcee8b22a4dabadd66c85d01ea,
+      type: 3}
+    Size: 6
+  playerControler: {fileID: 0}
