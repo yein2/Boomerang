@@ -4,12 +4,9 @@ using UnityEngine;
 using UnityEditor;
 public class Boomr : MonoBehaviour
 {
-    // 구현해볼 것
-    // 간섭쓰고 보호막 돌아오는거 구현
-    // 간섭 소스 좀더 클린하게 만들어 보기
 
     // 간섭에 사용될 변수들의 구조체 선언
-    public struct Gansub
+    public struct Twist
     {
         public Transform originPos;
 
@@ -23,9 +20,9 @@ public class Boomr : MonoBehaviour
     }
 
     // 구조체 변수 선언
-    Gansub gansub;
+    private Twist twist;
 
-    public enum BoomrState { Normal, Gansub, Return, Stop, WaitDestroy, OnDestroy};
+    public enum BoomrState { Normal, Twist, Return, Stop, WaitDestroy, OnDestroy };
     BoomrState boomrState;
 
     // 부메랑 모델을 받아올 게임 오브젝트 (따로 회전시키기 위해)
@@ -43,6 +40,8 @@ public class Boomr : MonoBehaviour
     // 부메랑의 Forward를 설정하기 위한 변수
     private Vector3 prePos;
 
+    private Quaternion prerot;
+
 
     // 던져진 상태인지
     public bool isThrow;
@@ -57,7 +56,7 @@ public class Boomr : MonoBehaviour
     private float timeCounter;
 
 
-    
+
 
 
     void Start()
@@ -80,23 +79,32 @@ public class Boomr : MonoBehaviour
             }
 
             // 간섭 구현 (베이저 카운터가 1 이상이면 정상적 이동중이지 않은 떄 간섭을 이미 사용하지 않았다면
-            if (Input.GetKeyDown(KeyCode.Z) && bezierCounter < 1 && boomrState != BoomrState.Gansub)
+            if (Input.GetKeyDown(KeyCode.Z) && bezierCounter < 1 && boomrState != BoomrState.Twist)
             {
                 // 움직임을 멈추기 위해
                 boomrState = BoomrState.Stop;
+
+                prerot = this.transform.rotation;
+            }
+
+            if (boomrState == BoomrState.Stop)
+            {
+                transform.rotation = controller.transform.rotation * prerot;
             }
 
             // 간섭 구현  나중에 업다운으로 바꾸면 && && bezierCounter 뺴도 됨
             if (Input.GetKeyDown(KeyCode.X) && boomrState == BoomrState.Stop)
             {
-                boomrState = BoomrState.Gansub;
+                boomrState = BoomrState.Twist;
                 GansubInit(this.transform, Point4);
             }
 
             if (boomrState != BoomrState.Stop)
             {
                 Move();
-                RotateModel(5f);
+
+                // 부메랑  모델 회전
+                model.transform.Rotate(10, 0, 0);
             }
         }
     }
@@ -116,6 +124,7 @@ public class Boomr : MonoBehaviour
 
         MoveSpeed = 5f;
         bezierCounter = 0;
+
         prePos = this.transform.position;
     }
 
@@ -130,6 +139,7 @@ public class Boomr : MonoBehaviour
         // 던짐 여부 비 활성화
         isThrow = false;
     }
+
 
     // 움직이는 함수
     void Move()
@@ -162,7 +172,7 @@ public class Boomr : MonoBehaviour
                 }
                 break;
 
-            case BoomrState.Gansub:
+            case BoomrState.Twist:
 
                 GansubRotate();
 
@@ -182,9 +192,9 @@ public class Boomr : MonoBehaviour
 
         }
 
-        
+
         // 노말의 진행도가 반 이상이거나 부메랑의 상태가 노말이 아니고 부메랑의 상태가 시한부가 아니라면 ( 밑에 구문 한번만 처리하기 위한 AND문)
-        if ( (bezierCounter >= 0.5f || boomrState != BoomrState.Normal) && boomrState != BoomrState.WaitDestroy)
+        if ((bezierCounter >= 0.5f || boomrState != BoomrState.Normal) && boomrState != BoomrState.WaitDestroy)
         {
             // 컨트롤러가 널이 아니고 만약 플레이어와 부메랑의 거리가 10 멀어졌다면
             if (Vector3.Distance(this.transform.position, Point4) < 0.5f)
@@ -203,45 +213,40 @@ public class Boomr : MonoBehaviour
         ObjectPoolManager.inst.ReturnObjectToPool("Boomerang", this.gameObject);
     }
 
-    void RotateModel(float _speed)
-    {
-        // 부메랑 회전
-        model.transform.Rotate(0, _speed, 0);
-    }
 
     void GansubInit(Transform _origin, Vector3 _target)
     {
         // 출발지를 받아둠 | 도착지는 Point4
 
-        gansub.originPos = _origin;
+        twist.originPos = _origin;
 
 
 
         // 구간별 러프 출발지
 
-        gansub.prePos = _origin;
+        twist.prePos = _origin;
 
 
 
         // 현재 부메랑과 도착지의 거리값을 넣고
 
-        gansub.distance = Vector3.Distance(_origin.position, _target);
+        twist.distance = Vector3.Distance(_origin.position, _target);
 
 
 
         // 거리값만큼 쪼개줌 (거리값이 2라면 dis에 0.5가 들어감)
 
-        gansub.distance = 1 / gansub.distance;
+        twist.distance = 1 / twist.distance;
 
 
 
         // 러프를 카운트해줄 변수
 
-        gansub.lerpCount = 0;
+        twist.lerpCount = 0;
 
         // 다음 분기점 값을 담을 변수 변수 ex) 1. ( 0 ~ lerpSet(0.3))- lerpSet + distance - ( 0.3 ~ lerpSet (0.6 ) ~
 
-        gansub.lerpFinal = gansub.distance;
+        twist.lerpFinal = twist.distance;
 
     }
 
@@ -262,39 +267,39 @@ public class Boomr : MonoBehaviour
 
             // 결과적으로는 처음이라면 Vector3.Slerp(0, 0.3, lerpCount) 두번째에는 Vector3.Slerp(0.3, 0.6, lerpCount)식으로 진행됨
 
-            this.transform.forward = Vector3.Slerp(gansub.prePos.forward, Vector3.Slerp(gansub.originPos.forward, Point4 - gansub.originPos.position, gansub.lerpFinal), gansub.lerpCount);
+            this.transform.forward = Vector3.Slerp(twist.prePos.forward, Vector3.Slerp(twist.originPos.forward, Point4 - twist.originPos.position, twist.lerpFinal), twist.lerpCount);
 
 
             // 러프카운트 누적합
 
-            gansub.lerpCount += 0.05f;
+            twist.lerpCount += 0.05f;
 
 
             // 만약 분기 회전이 끝났다면 다음 분기로 값을 세팅해줌
 
-            if (gansub.lerpCount >= 1)
+            if (twist.lerpCount >= 1)
 
             {
 
-                gansub.lerpCount = 0;
+                twist.lerpCount = 0;
 
 
 
                 // 분기별 시작 Forward에 현재의 Forward 넣어줌
 
-                gansub.prePos.forward = this.transform.forward;
+                twist.prePos.forward = this.transform.forward;
 
 
 
                 // 둘을 더하면 1을 넘는지
 
-                if (gansub.lerpFinal + gansub.distance < 1)
+                if (twist.lerpFinal + twist.distance < 1)
 
                 {
 
                     // 도착값을 다음 분기 값으로 세팅
 
-                    gansub.lerpFinal += gansub.distance;
+                    twist.lerpFinal += twist.distance;
 
                 }
 
@@ -304,7 +309,7 @@ public class Boomr : MonoBehaviour
 
                     // 넘으면 1로
 
-                    gansub.lerpFinal = 1;
+                    twist.lerpFinal = 1;
 
                 }
 
@@ -322,12 +327,12 @@ public class Boomr : MonoBehaviour
         if (_other.tag == "Shield")
         {
             // 간섭중 충돌했다면
-            if (boomrState == BoomrState.Gansub)
+            if (boomrState == BoomrState.Twist)
             {
                 this.transform.Rotate(0, 180, 0);
                 GansubInit(this.transform, Point1);
-                gansub.distance = 0.05f;
-                gansub.lerpFinal = 0.05f;
+                twist.distance = 0.05f;
+                twist.lerpFinal = 0.05f;
             }
             else
             {
@@ -346,12 +351,20 @@ public class Boomr : MonoBehaviour
                 Point2 = Point3;
 
                 Point3 = temp;
-
             }
-
-
-
         }
+
+        else if(_other.tag == "StartObject")
+        {
+            StageManager.inst.Invoke("ClearStage", 3f);
+            _other.gameObject.SetActive(false);
+        }
+
+        else if (_other.GetComponent<TutorialEnemy>())
+        {
+            boomrState = BoomrState.Stop;
+        }
+
 
     }
 }

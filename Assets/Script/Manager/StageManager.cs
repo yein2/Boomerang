@@ -6,7 +6,7 @@ using UnityEngine;
 // Enemy의 Spawn관련 정보값을 담을 구조체
 public struct EnemySpawn
 {
-    public enum EnemyType {Normal, Move, Shiled, ShiledChild, Ghost, Tank }
+    public enum EnemyType {Tutorial, Normal, Move, Shiled, ShiledChild, Ghost, Tank }
     public EnemyType enemyType;
     public Vector3 enemySpawnPos;
     public Quaternion enemySpawnRot;
@@ -31,17 +31,7 @@ public class StageManager : MonoBehaviour
 
         StageEnemyInfo = new EnemySpawn[5];
 
-        stageNum = 1;
-    }
-
-    private void Start()
-    {
-        StartStage();
-    }
-
-    void StartStage()
-    {
-        SetStage();
+        stageNum = 0;
     }
 
     public void ClearStage()
@@ -69,8 +59,10 @@ public class StageManager : MonoBehaviour
                 Stage1_2();
                 break;
             case 3:
+                Stage1_3();
                 break;
             case 4:
+                Stage2();
                 break;
             case 5:
                 break;
@@ -93,8 +85,29 @@ public class StageManager : MonoBehaviour
         StageEnemyInfo[0].enemySpawnRot = Quaternion.LookRotation(Vector3.zero);
 
     }
-
     void Stage1_2()
+    {
+        StageEnemyInfo = new EnemySpawn[1];
+
+        StageEnemyInfo[0].enemyType = EnemySpawn.EnemyType.Normal;
+        StageEnemyInfo[0].enemySpawnPos = new Vector3(-1.2f, 0, 6.44f);
+        StageEnemyInfo[0].enemySpawnRot = Quaternion.LookRotation(Vector3.zero);
+
+    }
+    void Stage1_3()
+    {
+        StageEnemyInfo = new EnemySpawn[2];
+
+        StageEnemyInfo[0].enemyType = EnemySpawn.EnemyType.Normal;
+        StageEnemyInfo[0].enemySpawnPos = new Vector3(-1.2f, 2, 6.44f);
+        StageEnemyInfo[0].enemySpawnRot = Quaternion.LookRotation(Vector3.zero);
+
+        StageEnemyInfo[1].enemyType = EnemySpawn.EnemyType.Tutorial;
+        StageEnemyInfo[1].enemySpawnPos = new Vector3(-1.2f, 0, 6.44f);
+        StageEnemyInfo[1].enemySpawnRot = Quaternion.LookRotation(Vector3.zero);
+    }
+
+    void Stage2()
     {
         StageEnemyInfo = new EnemySpawn[6];
 
