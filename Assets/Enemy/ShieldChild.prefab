@@ -106,4 +106,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c54be3d0367b8384bb59a8b6c79a2c21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShieldObj: {fileID: 0}
+  ShieldObj: {fileID: 5172632149393906428, guid: 0229e68809436664897374256534bbab,
+    type: 3}

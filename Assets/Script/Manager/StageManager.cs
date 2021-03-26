@@ -41,18 +41,14 @@ public class StageManager : MonoBehaviour
 
     void StartStage()
     {
-
-        SetStage(stageNum);
-        // 메모리풀에 넘겨줌
-        ObjectPoolManager.inst.ActiveStageEnemyInPool(StageEnemyInfo);
+        SetStage();
     }
 
     public void ClearStage()
     {
         stageNum++;
 
-
-        Invoke("StartStage", 1.0f);
+        Invoke("SetStage", 1.0f);
     }
 
     public void FailStage()
@@ -62,9 +58,9 @@ public class StageManager : MonoBehaviour
         // 메인 화면으로
     }
 
-    void SetStage(int _stageNum)
+    void SetStage()
     {
-        switch (_stageNum)
+        switch (stageNum)
         {
             case 1:
                 Stage1_1();
@@ -79,6 +75,9 @@ public class StageManager : MonoBehaviour
             case 5:
                 break;
         }
+
+        // 메모리풀에 넘겨줌
+        ObjectPoolManager.inst.ActiveStageEnemyInPool(StageEnemyInfo);
     }
 
     // 스테이지 작성 규칙

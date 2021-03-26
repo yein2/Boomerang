@@ -30,7 +30,6 @@ public class GhostEnemy : EnemyCS
 
     private void Update()
     {
-        print(this.transform.rotation);
 
         // 첫번째 고스트가 맞은 상태면
         if (isHIt)

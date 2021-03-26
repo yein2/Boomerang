@@ -175,8 +175,12 @@ public class ObjectPoolManager : MonoBehaviour
             Debug.Log(poolName + "의 오브젝트 풀을 사용할 수 없음. (1# 이름이 다를 수 있음. 2# 반환 함수 확인");
         }
 
-        // 에너미가 한마리씩 죽을때마다 체크
-        CheckClearStage();
+        // active False 처리된 오브젝트가 부메랑이 아닐 경우에만
+        if (poolName != "Boomerang")
+        {
+            // 에너미가 한마리씩 죽을때마다 클리어 인지 체크
+            CheckClearStage();
+        }
     }
 
     // 스테이지를 클리어 했는지 검사
