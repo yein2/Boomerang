@@ -4,9 +4,11 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Boomr
   - Shield
   - StartObject
+  - Boomr
+  - Enemy
+  - Tutorial
   layers:
   - Default
   - TransparentFX

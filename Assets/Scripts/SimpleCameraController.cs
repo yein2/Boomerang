@@ -81,7 +81,7 @@ namespace UnityTemplateProjects
             m_TargetCameraState.SetFromTransform(transform);
             m_InterpolatingCameraState.SetFromTransform(transform);
         }
-
+/*
         Vector3 GetInputTranslationDirection()
         {
             Vector3 direction = new Vector3();
@@ -111,6 +111,7 @@ namespace UnityTemplateProjects
             }
             return direction;
         }
+        */
         
         void Update()
         {
@@ -151,7 +152,7 @@ namespace UnityTemplateProjects
             }
             
             // Translation
-            translation = GetInputTranslationDirection() * Time.deltaTime;
+            // translation = GetInputTranslationDirection() * Time.deltaTime;
 
             // Speed up movement when shift key held
             if (Input.GetKey(KeyCode.LeftShift))

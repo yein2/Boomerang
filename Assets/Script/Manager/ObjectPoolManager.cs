@@ -143,6 +143,10 @@ public class ObjectPoolManager : MonoBehaviour
                 // 예외처리가 필요한 쉴드와 쉴드 차일드를 예외처리 해줌
                 switch (_poolName)
                 {
+                    case "Boomerang":
+                    obj.GetComponent<Boomr>().Init();
+                    break;
+
                     case "Shield":
                         shieldEnemy = obj;
                         break;
@@ -208,11 +212,16 @@ public class ObjectPoolManager : MonoBehaviour
 
         if (isClear)
         {
+            // next stage? UI 띄우기
+            
             // 스테이지 에너미들 다 삭제
             stageEnemyList.Clear();
 
             // 다음 스테이지로 
             StageManager.inst.ClearStage();
+
+            StageManager.inst.SetTimer();
+            
         }
     }
 }

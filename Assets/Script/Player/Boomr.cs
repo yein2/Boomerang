@@ -56,6 +56,11 @@ public class Boomr : MonoBehaviour
     private float timeCounter;
 
 
+    // 부메랑 트레일렌더러
+    public TrailRenderer trailRend;
+
+    // 오른쪽 부메랑인지 체크
+    public bool isRightBoomr; // true = 왼손 false = 오른손
 
 
 
@@ -71,11 +76,16 @@ public class Boomr : MonoBehaviour
         // 던진 상태면 움직임
         if (isThrow)
         {
+            if(boomrState != BoomrState.Stop)
+            IncreaseTrail();
+
             // 긴급회귀 버튼을 누르면 회귀
             if (Input.GetKeyDown(KeyCode.H))
             {
                 boomrState = BoomrState.Return;
                 this.transform.forward = controller.transform.position - this.transform.position;
+
+                trailRend.time = 2f; // 트레일 고정 풀기
             }
 
             // 간섭 구현 (베이저 카운터가 1 이상이면 정상적 이동중이지 않은 떄 간섭을 이미 사용하지 않았다면
@@ -85,6 +95,9 @@ public class Boomr : MonoBehaviour
                 boomrState = BoomrState.Stop;
 
                 prerot = this.transform.rotation;
+
+                // 트레일 렌더러 trail 30초 고정
+                trailRend.time = 30f;
             }
 
             if (boomrState == BoomrState.Stop)
@@ -97,6 +110,9 @@ public class Boomr : MonoBehaviour
             {
                 boomrState = BoomrState.Twist;
                 GansubInit(this.transform, Point4);
+
+                // 트레일 렌더러 고정 풀기
+                trailRend.time = 1f;
             }
 
             if (boomrState != BoomrState.Stop)
@@ -107,6 +123,12 @@ public class Boomr : MonoBehaviour
                 model.transform.Rotate(10, 0, 0);
             }
         }
+
+        if(!isThrow)
+        {
+             ShortenTrail();
+        }
+
     }
 
     public void SetBezierPoint(Vector3 _p1, Vector3 _p2, Vector3 _p3, Vector3 _p4)
@@ -126,8 +148,26 @@ public class Boomr : MonoBehaviour
         bezierCounter = 0;
 
         prePos = this.transform.position;
+        
     }
 
+    private void IncreaseTrail() 
+    {        
+            if(trailRend.startWidth < 0.39f)
+            trailRend.startWidth += 0.25f * Time.deltaTime;
+            else if(trailRend.startWidth >= 0.6f)
+            trailRend.startWidth = 0.4f;
+
+            if(trailRend.time < 1f)
+            trailRend.time += 0.5f * Time.deltaTime;
+            else if(trailRend.time >= 1f)
+            trailRend.time = 1f;
+    }
+    private void ShortenTrail()
+    {
+        trailRend.startWidth = 0.1f;
+        trailRend.time = 0.2f;
+    }
     // 부메랑이 잡혔을떄 호출되는 함수
     public void Init()
     {
@@ -138,6 +178,10 @@ public class Boomr : MonoBehaviour
 
         // 던짐 여부 비 활성화
         isThrow = false;
+
+        // 중력 설정 초기화
+        this.GetComponent<Rigidbody>().useGravity =false;
+        this.GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
 
@@ -319,7 +363,17 @@ public class Boomr : MonoBehaviour
     }
 
 
-    // 베지어 점과 점 Lerp 연결
+    public void DistinctionHand(bool hand) //왼손으로 잡은 부메랑인지 오른손을로 잡은 부메랑인지 체크
+    {
+        if(!hand)
+        {
+            isRightBoomr = false;
+        }
+        if(hand)
+        {
+            isRightBoomr = true;
+        }
+    }
 
     private void OnTriggerEnter(Collider _other)
 
@@ -360,11 +414,33 @@ public class Boomr : MonoBehaviour
             _other.gameObject.SetActive(false);
         }
 
-        else if (_other.GetComponent<TutorialEnemy>())
+        if(_other.tag == "Tutorial") // 튜토리얼 타겟 맞추기
         {
+            // 부메랑 상태 스탑
             boomrState = BoomrState.Stop;
+            // 도움말 띄움
+
+            // 트레일 30초 고정
+            trailRend.time = 30f;
+
+
         }
 
+    // 에너미와 충돌 
+        // 왼손 오른손 구분해서 점수 증가
+        if(_other.tag == "Enemy")
+        {            
+            if(!isRightBoomr) // 왼손
+            {
+                ScoreManager.inst.ContainScore(isRightBoomr);
+                ScoreManager.inst.AddScore(isRightBoomr); // 점수증가                
+            }
 
+            if(isRightBoomr) // 오른손
+            {
+                ScoreManager.inst.ContainScore(isRightBoomr);
+                ScoreManager.inst.AddScore(isRightBoomr); // 점수증가                
+            }
+        }
     }
 }

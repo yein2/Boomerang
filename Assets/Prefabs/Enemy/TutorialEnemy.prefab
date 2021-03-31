@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2994423239982454915}
   m_Layer: 0
   m_Name: TutorialEnemy
-  m_TagString: Untagged
+  m_TagString: Tutorial
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
