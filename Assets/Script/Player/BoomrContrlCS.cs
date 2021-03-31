@@ -65,7 +65,7 @@ public class BoomrContrlCS : MonoBehaviour
         // 변수가 null이 아니라면 (현재 컨트롤러와 부메랑이 충돌한 상태라면)
         if (boomrObj != null)
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.G) && !boomrObj.GetComponent<Rigidbody>().useGravity)
             {
                 // 잡았으니 True로
                 isCatching = true;
@@ -76,6 +76,22 @@ public class BoomrContrlCS : MonoBehaviour
 
                 // 부메랑 소스 내부의 초기화 함수 호출 (날아온 부메랑을 잡은 경우 부메랑 이동 멈출수 있게)
                 boomrObj.GetComponent<Boomr>().Init();
+
+                 if(isRightControler)
+                {
+                    boomrObj.GetComponent<Boomr>().isRightBoomr = true;
+                }
+                else
+                {
+                    boomrObj.GetComponent<Boomr>().isRightBoomr = false;
+                }
+
+                // 캐치했을 때 왼손으로 받은지 오른손으로 받은지 체크 / 다음 부메랑 던질때 해당손 부메랑으로 나감
+                boomrObj.GetComponent<Boomr>().DistinctionHand(isRightControler);
+                    
+                // 캐치 보너스 점수 , 던짐 상태 초기화
+                    ScoreManager.inst.CatchBoomr(isRightControler);                    
+                    ScoreManager.inst.EndThrow(isRightControler);
             }
             // KeyDown을 눌러 잡은 상태에서만 동장하도록 (미리 누르고 있어도 잡히는 걸 방지하기 위해)
             if (isCatching)

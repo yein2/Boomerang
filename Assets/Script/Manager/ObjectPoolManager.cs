@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
+using UnityEngine.SceneManagement;
 
 // 개체 풀의 기본 속성
 // 현재 개체 풀의 이름, 프리 팹 및 크기를 저장
@@ -51,7 +51,7 @@ public class ObjectPoolManager : MonoBehaviour
             GameObject poolParentObj = new GameObject();
             poolParentObj.name = pool.Name + "Pool";
 
-            GameObject.DontDestroyOnLoad(poolParentObj);
+            //GameObject.DontDestroyOnLoad(poolParentObj);
 
             // 개체 풀을 만들고 여기에 개체 저장
             Queue<GameObject> poolQueue = new Queue<GameObject>();
@@ -70,6 +70,13 @@ public class ObjectPoolManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene("Main");
+        }
+    }
 
     // 개체 생성 함수 (꺼내 쓰기)
     // 개체 풀에서 개체 가져 오기 개체의 위치 및 회전을 설정.    
@@ -82,6 +89,9 @@ public class ObjectPoolManager : MonoBehaviour
         {
             switch (_stageEnemyInfo[count].enemyType)
             {
+                case EnemySpawn.EnemyType.Tutorial:
+                    GetObjectFromPool("Tutorial", _stageEnemyInfo[count].enemySpawnPos, _stageEnemyInfo[count].enemySpawnRot);
+                    break;
 
                 case EnemySpawn.EnemyType.Normal:
                     GetObjectFromPool("Normal", _stageEnemyInfo[count].enemySpawnPos, _stageEnemyInfo[count].enemySpawnRot);
@@ -133,12 +143,16 @@ public class ObjectPoolManager : MonoBehaviour
                 // 예외처리가 필요한 쉴드와 쉴드 차일드를 예외처리 해줌
                 switch (_poolName)
                 {
+                    case "Boomerang":
+                    obj.GetComponent<Boomr>().Init();
+                    break;
+
                     case "Shield":
                         shieldEnemy = obj;
                         break;
                     case "ShieldChild":
                         // 쉴드 자식에게 쉴드 에너미를 넣어줌
-                        obj.GetComponent<ShieldChildEnemy>().ShieldObj = shieldEnemy;
+                        obj.GetComponent<ShieldChildEnemy>().shieldObj = shieldEnemy;
 
                         // 쉴드 에너미의 자식 수를 올려줌
                         shieldEnemy.GetComponent<ShieldEnemy>().childCount++;
@@ -146,8 +160,8 @@ public class ObjectPoolManager : MonoBehaviour
                 }
 
                 // 부메랑이 아니면
-                if(_poolName != "Boomerang")
-                // 스테이지리스트에 스테이지에 생성된 에너미 추가
+                if (_poolName != "Boomerang")
+                    // 스테이지리스트에 스테이지에 생성된 에너미 추가
                     stageEnemyList.Add(obj);
             }
             else
@@ -198,11 +212,16 @@ public class ObjectPoolManager : MonoBehaviour
 
         if (isClear)
         {
+            // next stage? UI 띄우기
+            
             // 스테이지 에너미들 다 삭제
             stageEnemyList.Clear();
 
             // 다음 스테이지로 
             StageManager.inst.ClearStage();
+
+            StageManager.inst.SetTimer();
+            
         }
     }
 }
